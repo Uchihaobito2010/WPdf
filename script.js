@@ -1,3 +1,9 @@
+function updateBadges() {
+  [...preview.children].forEach((box, i) => {
+    const badge = box.querySelector(".badge");
+    if (badge) badge.textContent = i + 1;
+  });
+}
 const input = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const createBtn = document.getElementById("createBtn");

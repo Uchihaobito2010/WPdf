@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OBITO • Image to PDF</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <div class="card">
+    <div class="logo">
+      🌀 <span>OBITO</span>
+    </div>
+
+    <p class="subtitle">Image → PDF Studio</p>
+
+    <input type="file" id="imageInput" accept="image/*" multiple>
+
+    <div id="preview" class="preview"></div>
+
+    <div class="editor">
+      <label>Position X</label>
+      <input type="range" id="posX" min="0" max="40" value="10">
+
+      <label>Position Y</label>
+      <input type="range" id="posY" min="0" max="40" value="10">
+
+      <label>Scale</label>
+      <input type="range" id="scale" min="60" max="100" value="95">
+
+      <label>Rotate</label>
+      <select id="rotate">
+        <option value="0">0°</option>
+        <option value="90">90°</option>
+        <option value="180">180°</option>
+        <option value="270">270°</option>
+      </select>
+    </div>
+
+    <button onclick="generatePDF()">📄 Create PDF</button>
+  </div>
+
+  <footer>
+    © Paras Chourasiya 2025
+    <div class="icons">
+      <a href="https://instagram.com/pa74s" target="_blank">IG</a>
+      <a href="https://t.me/Aotpy" target="_blank">TG</a>
+    </div>
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

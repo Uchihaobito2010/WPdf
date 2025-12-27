@@ -1,9 +1,3 @@
-function updateBadges() {
-  [...preview.children].forEach((box, i) => {
-    const badge = box.querySelector(".badge");
-    if (badge) badge.textContent = i + 1;
-  });
-}
 const input = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const createBtn = document.getElementById("createBtn");
@@ -15,48 +9,67 @@ const scale = document.getElementById("scale");
 const rotate = document.getElementById("rotate");
 
 let pages = [];
-let activeIndex = null;
+let activePage = null;
 
-/* ---------- live preview ---------- */
-function applyPreview(i) {
-  const box = preview.children[i];
-  if (!box) return;
+/* ---------------- helpers ---------------- */
 
-  const img = box.querySelector("img");
-  const p = pages[i];
+function updateBadges() {
+  [...preview.children].forEach((box, i) => {
+    box.querySelector(".badge").textContent = i + 1;
+  });
+}
 
+function applyPreview(page) {
+  if (!page || !page.box) return;
+
+  const img = page.box.querySelector("img");
   img.style.transform = `
-    translate(${p.x}px, ${p.y}px)
-    scale(${p.scale / 100})
-    rotate(${p.rotate}deg)
+    translate(${page.x}px, ${page.y}px)
+    scale(${page.scale / 100})
+    rotate(${page.rotate}deg)
   `;
 }
 
+function syncControls(page) {
+  posX.value = page.x;
+  posY.value = page.y;
+  scale.value = page.scale;
+  rotate.value = page.rotate;
+}
+
+/* ---------------- live controls ---------------- */
+
 [posX, posY, scale, rotate].forEach(el => {
   el.addEventListener("input", () => {
-    if (activeIndex === null) return;
+    if (!activePage) return;
 
-    Object.assign(pages[activeIndex], {
-      x: +posX.value,
-      y: +posY.value,
-      scale: +scale.value,
-      rotate: +rotate.value
-    });
+    activePage.x = +posX.value;
+    activePage.y = +posY.value;
+    activePage.scale = +scale.value;
+    activePage.rotate = +rotate.value;
 
-    applyPreview(activeIndex);
+    applyPreview(activePage);
   });
 });
 
-/* ---------- load images ---------- */
+/* ---------------- image load ---------------- */
+
 input.addEventListener("change", () => {
   preview.innerHTML = "";
   pages = [];
-  activeIndex = null;
+  activePage = null;
 
-  [...input.files].forEach((file, i) => {
+  [...input.files].forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
-      pages.push({ src: e.target.result, x: 0, y: 0, scale: 100, rotate: 0 });
+      const page = {
+        src: e.target.result,
+        x: 0,
+        y: 0,
+        scale: 100,
+        rotate: 0,
+        box: null
+      };
 
       const box = document.createElement("div");
       box.className = "image-box";
@@ -66,50 +79,61 @@ input.addEventListener("change", () => {
 
       const badge = document.createElement("span");
       badge.className = "badge";
-      badge.textContent = i + 1;
 
       box.append(img, badge);
       preview.appendChild(box);
 
+      page.box = box;
+      pages.push(page);
+
       box.onclick = () => {
-        document.querySelectorAll(".image-box").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".image-box")
+          .forEach(b => b.classList.remove("active"));
+
         box.classList.add("active");
-        activeIndex = i;
+        activePage = page;
 
-        posX.value = pages[i].x;
-        posY.value = pages[i].y;
-        scale.value = pages[i].scale;
-        rotate.value = pages[i].rotate;
-
-        applyPreview(i);
+        syncControls(page);
+        applyPreview(page);
       };
+
+      updateBadges();
     };
     reader.readAsDataURL(file);
   });
 });
 
-/* ---------- reorder ---------- */
+/* ---------------- reorder ---------------- */
+
 new Sortable(preview, {
   animation: 150,
   onEnd: () => {
-    pages = [...preview.children].map(b => {
-      const src = b.querySelector("img").src;
-      return pages.find(p => p.src === src);
-    });
-    activeIndex = null;
+    pages = [...preview.children].map(box =>
+      pages.find(p => p.box === box)
+    );
+    updateBadges();
   }
 });
 
-/* ---------- generate pdf ---------- */
-createBtn.onclick = () => {
-  if (!pages.length) return alert("Select images first");
+/* ---------------- PDF generate (FIXED) ---------------- */
 
-  const name = (pdfNameInput.value || "image-to-pdf").replace(/\.pdf$/i, "");
+createBtn.onclick = async () => {
+  if (!pages.length) {
+    alert("Select images first");
+    return;
+  }
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
 
-  pages.forEach((p, i) => {
-    if (i) pdf.addPage();
+  for (let i = 0; i < pages.length; i++) {
+    const p = pages[i];
+    if (i !== 0) pdf.addPage();
+
+    const img = new Image();
+    img.src = p.src;
+
+    await new Promise(res => (img.onload = res));
 
     const w = (210 * p.scale) / 100;
     const h = (297 * p.scale) / 100;
@@ -118,9 +142,10 @@ createBtn.onclick = () => {
     pdf.saveGraphicsState();
     pdf.translate(105 + p.x, 148 + p.y);
     pdf.rotate(rad);
-    pdf.addImage(p.src, "JPEG", -w / 2, -h / 2, w, h);
+    pdf.addImage(img, "PNG", -w / 2, -h / 2, w, h);
     pdf.restoreGraphicsState();
-  });
+  }
 
+  const name = (pdfNameInput.value || "image-to-pdf").replace(/\.pdf$/i, "");
   pdf.save(`${name}.pdf`);
 };

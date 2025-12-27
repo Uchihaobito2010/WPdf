@@ -1,62 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OBITO • Image to PDF</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <title>OBITO • Image to PDF</title>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Icons (optional but safe) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
 
-<div class="wrapper">
+  <div class="app">
+    <div class="card">
 
-  <div class="card">
-    <div class="logo">
-      🌀 <span>OBITO</span>
+      <h1>OBITO</h1>
+      <p class="subtitle">Image → PDF Studio</p>
+
+      <!-- IMAGE INPUT -->
+      <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+        multiple
+      />
+
+      <!-- PREVIEW -->
+      <div id="preview" class="preview"></div>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+        <label>Position X</label>
+        <input type="range" id="posX" min="-50" max="50" value="0">
+
+        <label>Position Y</label>
+        <input type="range" id="posY" min="-50" max="50" value="0">
+
+        <label>Scale</label>
+        <input type="range" id="scale" min="50" max="150" value="100">
+
+        <label>Rotate</label>
+        <select id="rotate">
+          <option value="0">0°</option>
+          <option value="90">90°</option>
+          <option value="180">180°</option>
+          <option value="270">270°</option>
+        </select>
+      </div>
+
+      <!-- BUTTON -->
+      <button id="createPdfBtn">Create PDF</button>
+
     </div>
 
-    <p class="subtitle">Image → PDF Studio</p>
+    <!-- FOOTER -->
+    <footer class="footer">
+      <a href="https://instagram.com/pa74s" target="_blank" aria-label="Instagram">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg">
+      </a>
 
-    <input type="file" id="imageInput" accept="image/*" multiple>
+      <a href="https://t.me/Aotpy" target="_blank" aria-label="Telegram">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg">
+      </a>
 
-    <div id="preview" class="preview"></div>
-
-    <div class="editor">
-      <label>Position X</label>
-      <input type="range" id="posX" min="0" max="40" value="10">
-
-      <label>Position Y</label>
-      <input type="range" id="posY" min="0" max="40" value="10">
-
-      <label>Scale</label>
-      <input type="range" id="scale" min="60" max="100" value="95">
-
-      <label>Rotate</label>
-      <select id="rotate">
-        <option value="0">0°</option>
-        <option value="90">90°</option>
-        <option value="180">180°</option>
-        <option value="270">270°</option>
-      </select>
-    </div>
-
-    <button onclick="generatePDF()">📄 Create PDF</button>
+      <span>© 2025 Paras Chourasiya</span>
+    </footer>
   </div>
 
-<footer class="footer">
-  <a href="https://instagram.com/pa74s" target="_blank" aria-label="Instagram">
-    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg">
-  </a>
+  <!-- MAIN SCRIPT (VERY IMPORTANT: LAST) -->
+  <script src="script.js"></script>
 
-  <a href="https://t.me/Aotpy" target="_blank" aria-label="Telegram">
-    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg">
-  </a>
+  <!-- BUTTON BINDING (CRITICAL FIX) -->
+  <script>
+    document
+      .getElementById("createPdfBtn")
+      .addEventListener("click", generatePDF);
+  </script>
 
-  <span>© 2025 Paras Chourasiya</span>
-</footer>
+</body>
+</html>

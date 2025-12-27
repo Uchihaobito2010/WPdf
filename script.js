@@ -20,9 +20,9 @@ function updateBadges() {
 }
 
 function applyPreview(page) {
-  if (!page || !page.box) return;
-
+  if (!page) return;
   const img = page.box.querySelector("img");
+
   img.style.transform = `
     translate(${page.x}px, ${page.y}px)
     scale(${page.scale / 100})
@@ -63,7 +63,7 @@ input.addEventListener("change", () => {
     const reader = new FileReader();
     reader.onload = e => {
       const page = {
-        src: e.target.result,
+        src: e.target.result, // already loaded base64
         x: 0,
         y: 0,
         scale: 100,
@@ -75,7 +75,7 @@ input.addEventListener("change", () => {
       box.className = "image-box";
 
       const img = document.createElement("img");
-      img.src = e.target.result;
+      img.src = page.src;
 
       const badge = document.createElement("span");
       badge.className = "badge";
@@ -87,12 +87,10 @@ input.addEventListener("change", () => {
       pages.push(page);
 
       box.onclick = () => {
-        document.querySelectorAll(".image-box")
-          .forEach(b => b.classList.remove("active"));
-
+        document.querySelectorAll(".image-box").forEach(b => b.classList.remove("active"));
         box.classList.add("active");
-        activePage = page;
 
+        activePage = page;
         syncControls(page);
         applyPreview(page);
       };
@@ -115,9 +113,9 @@ new Sortable(preview, {
   }
 });
 
-/* ---------------- PDF generate (FIXED) ---------------- */
+/* ---------------- PDF CREATE (SYNC — THIS IS KEY) ---------------- */
 
-createBtn.onclick = async () => {
+createBtn.onclick = () => {
   if (!pages.length) {
     alert("Select images first");
     return;
@@ -126,14 +124,8 @@ createBtn.onclick = async () => {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
 
-  for (let i = 0; i < pages.length; i++) {
-    const p = pages[i];
+  pages.forEach((p, i) => {
     if (i !== 0) pdf.addPage();
-
-    const img = new Image();
-    img.src = p.src;
-
-    await new Promise(res => (img.onload = res));
 
     const w = (210 * p.scale) / 100;
     const h = (297 * p.scale) / 100;
@@ -142,10 +134,13 @@ createBtn.onclick = async () => {
     pdf.saveGraphicsState();
     pdf.translate(105 + p.x, 148 + p.y);
     pdf.rotate(rad);
-    pdf.addImage(img, "PNG", -w / 2, -h / 2, w, h);
+
+    // IMPORTANT: use base64 directly
+    pdf.addImage(p.src, "PNG", -w / 2, -h / 2, w, h);
+
     pdf.restoreGraphicsState();
-  }
+  });
 
   const name = (pdfNameInput.value || "image-to-pdf").replace(/\.pdf$/i, "");
-  pdf.save(`${name}.pdf`);
+  pdf.save(name + ".pdf");
 };

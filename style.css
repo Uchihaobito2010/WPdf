@@ -2,37 +2,25 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
   background: #0b0f1a;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  font-family: system-ui, -apple-system;
   color: #e5e7eb;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .app {
   width: 100%;
   max-width: 420px;
-  background: #111827;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.6);
+  padding: 16px;
 }
 
 h1 {
-  margin: 0;
   font-size: 20px;
-  color: #60a5fa;
+  margin-bottom: 10px;
 }
 
-.subtitle {
-  font-size: 12px;
-  opacity: .6;
-  margin-bottom: 14px;
-}
-
-input[type=file] {
+input, select {
   width: 100%;
   margin-bottom: 12px;
 }
@@ -41,19 +29,24 @@ input[type=file] {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #1f2937;
   border-radius: 10px;
   margin-bottom: 14px;
 }
 
 .image-box {
-  width: 80px;
-  height: 100px;
+  width: 90px;
+  height: 110px;
   background: #020617;
   border-radius: 8px;
   padding: 4px;
   position: relative;
+  cursor: pointer;
+}
+
+.image-box.active {
+  outline: 2px solid #3b82f6;
 }
 
 .image-box img {
@@ -75,12 +68,6 @@ input[type=file] {
   opacity: .7;
 }
 
-.controls input,
-.controls select {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
 button {
   width: 100%;
   padding: 12px;
@@ -93,13 +80,17 @@ button {
   cursor: pointer;
 }
 
-button:active {
-  transform: scale(.98);
+.footer {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: 11px;
+  opacity: .6;
 }
 
-footer {
-  margin-top: 12px;
-  font-size: 11px;
-  text-align: center;
-  opacity: .5;
-  }
+.footer img {
+  width: 18px;
+  filter: invert(1);
+                 }
